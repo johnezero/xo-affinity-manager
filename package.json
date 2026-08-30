@@ -1,0 +1,30 @@
+{
+  "name": "xo-server-affinity-manager",
+  "version": "0.1.1",
+  "description": "Tag-based affinity and anti-affinity management for XCP-ng",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "babel src/index.mjs --out-dir dist --out-file-extension .js"
+  },
+  "files": [
+    "dist/",
+    "help.md"
+  ],
+  "keywords": [
+    "xen-orchestra",
+    "plugin",
+    "xcp-ng",
+    "affinity"
+  ],
+  "author": "John Olsen",
+  "license": "ISC",
+  "dependencies": {
+    "@xen-orchestra/cron": "^0.1.0",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.0.0",
+    "@babel/core": "^7.0.0",
+    "@babel/preset-env": "^7.0.0"
+  }
+}
