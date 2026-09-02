@@ -64,44 +64,45 @@ Apply these tags directly to your **XCP-ng hosts** in the Xen Orchestra UI:
 | `P2-DC1-HOST` | POOL-2 | Data Center 1 |
 | `P2-DC2-HOST` | POOL-2 | Data Center 2 |
 
-> ⚠️ **Important:** Host tags do **NOT** use the `AM-` prefix. The `AM-` prefix lives only
-> on the VM tag side. The plugin strips `AM-RunOn_` (or `AM-NotOn_`) from the VM tag and
-> matches the remainder **exactly** against host tags.
->
-> ✅ Correct host tag: `P1-DC1-HOST`
-> ❌ Wrong host tag:   `AM-P1-DC1-HOST`
-
 ---
 
 ## Installation
 
-The plugin is available as a pre-built release bundle — no Babel or build tools required on the target system.
+1. Download the latest airgap release tarball from GitHub:
+   https://github.com/johnezero/xo-affinity-manager/releases
 
-### Quick Install (Recommended)
+2. SCP the tarball to your XOA:
+   ```bash
+   scp xo-affinity-manager-airgap-vX.X.X.tar.gz <xoa-user>@<xoa-ip>:/tmp/
+   ```
 
-**1. Download and extract the release bundle:**
-```bash
-sudo mkdir -p /usr/local/lib/node_modules/xo-server-affinity-manager
-cd /usr/local/lib/node_modules/xo-server-affinity-manager
-sudo wget https://github.com/john/xo-server-affinity-manager/releases/download/v0.3.6/xo-server-affinity-manager-v0.3.6.tar.gz
-sudo tar -xzf xo-server-affinity-manager-v0.3.6.tar.gz --strip-components=1
-```
+3. Create the plugin folder:
+   ```bash
+   sudo mkdir -p /usr/local/lib/node_modules/xo-server-affinity-manager
+   ```
 
-**2. Install dependencies:**
-```bash
-sudo npm install --production
-```
+4. Extract directly into the plugin directory:
+   ```bash
+   sudo tar -xzvf /tmp/xo-affinity-manager-airgap-vX.X.X.tar.gz -C /usr/local/lib/node_modules/xo-server-affinity-manager/ --strip-components=1
+   ```
 
-**3. Restart xo-server:**
-```bash
-sudo systemctl restart xo-server
-```
+5. Restart xo-server:
+   ```bash
+   sudo systemctl restart xo-server
+   ```
 
-**4. Enable in XO UI:**
-Navigate to **Settings → Plugins**, find `xo-server-affinity-manager`, click **+** to configure, then toggle it **ON**.
+6. Verify registration:
+   ```bash
+   sudo journalctl -u xo-server -n 100 --no-pager | grep -A3 "affinity-manager"
+   ```
 
-> 💡 **Tip:** After enabling or updating the plugin, always do a hard refresh (`Ctrl+Shift+R`)
-> in your browser — XO caches the plugin configuration schema aggressively.
+   You should see:
+     [INFO] xo-affinity-manager: Plugin factory called -- xo context: YES
+     [INFO] xo-affinity-manager: Plugin loaded -- waiting for core started.
+     xo:plugin INFO successfully register affinity-manager
+
+7. Enable and configure the plugin in XO:
+     Settings -> Plugins -> affinity-manager -> Enable
 
 ---
 
@@ -273,34 +274,6 @@ P1-DC1-HOST
 | **Halted VMs** | Skipped automatically — plugin only acts on running VMs with a confirmed resident host |
 | **Leader Election** | For `KeepTogether`, the first VM processed in the cycle becomes the leader. Stabilizes quickly in practice. |
 | **KeepApart Limits** | Warns in logs if there are not enough unique hosts — never forces an impossible migration |
-
----
-
-## Troubleshooting
-
-### Plugin shows 0 hosts in logs
-**Symptom:** `Found 726 real VMs and 0 hosts`
-**Cause:** Host type filter mismatch — XO may return `obj.type` or `obj.$type` depending on version.
-**Fix:** Ensure the host filter uses: `obj.type === 'host' || obj.$type === 'host'` (fixed in v0.3.1+)
-
-### VMs not migrating despite correct tags
-**Check 1:** Confirm **Dry Run Mode** is OFF.
-**Check 2:** Verify host tags do NOT have the `AM-` prefix (e.g. `P1-DC1-HOST` not `AM-P1-DC1-HOST`).
-**Check 3:** Confirm the VM tag suffix exactly matches the host tag (case-sensitive).
-**Check 4:** Check logs for `[WARN]` entries — halted VMs are skipped.
-
-### Plugin config page shows old syntax after update
-**Cause:** XO caches the plugin configuration schema aggressively.
-**Fix:** Hard refresh (`Ctrl+Shift+R`) or open XO in a private/incognito window.
-**Note:** Syntax/example text lives in `index.mjs` (not `package.json`) — update and rebuild if changing reference text.
-
-### Scheduler stops after config change
-**Symptom:** Plugin runs once then stops enforcing on schedule.
-**Fix:** Ensure `configure()` explicitly stops the old job and starts a new one (fixed in v0.3.2+).
-
-### `journalctl` shows no xo-server output
-**Cause:** Insufficient journal read permissions.
-**Fix:** Use `sudo journalctl -u xo-server | grep -i affinity | tail -20`
 
 ---
 
