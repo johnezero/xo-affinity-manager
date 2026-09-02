@@ -17,7 +17,6 @@ Automated VM placement rules driven entirely by tags you apply in the XO UI — 
 - [Logging](#logging)
 - [Real-World Examples](#real-world-examples)
 - [Technical Details](#technical-details)
-- [Troubleshooting](#troubleshooting)
 - [Changelog](#changelog)
 - [License](#license)
 - [Disclaimer](#disclaimer)
