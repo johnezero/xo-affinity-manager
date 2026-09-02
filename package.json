@@ -1,26 +1,39 @@
 {
   "name": "xo-server-affinity-manager",
-  "version": "0.1.1",
+  "version": "0.3.6",
   "description": "Tag-based affinity and anti-affinity management for XCP-ng",
   "main": "dist/index.js",
   "scripts": {
     "build": "babel src/index.mjs --out-dir dist --out-file-extension .js"
   },
-  "files": [
-    "dist/",
-    "help.md"
-  ],
-  "keywords": [
-    "xen-orchestra",
-    "plugin",
-    "xcp-ng",
-    "affinity"
-  ],
-  "author": "John Olsen",
-  "license": "ISC",
+  "xo-server-plugin": {
+    "configurationSchema": {
+      "type": "object",
+      "properties": {
+        "schedule": {
+          "type": "string",
+          "enum": ["15min", "hourly", "daily"],
+          "default": "15min",
+          "title": "Enforcement Schedule",
+          "description": "How often affinity rules are evaluated. 15min | hourly | daily (2 AM)."
+        },
+        "dryRun": {
+          "type": "boolean",
+          "default": true,
+          "title": "Dry Run Mode",
+          "description": "When ON (default), logs all intended actions without moving any VMs. Turn OFF to enforce rules live."
+        },
+        "nfsLogPath": {
+          "type": "string",
+          "default": "/mnt/v0/code/affinity-manager/logs",
+          "title": "Log Path",
+          "description": "Absolute path to the log directory. Created automatically if it does not exist."
+        }
+      }
+    }
+  },
   "dependencies": {
-    "@xen-orchestra/cron": "^0.1.0",
-    "lodash": "^4.17.21"
+    "@xen-orchestra/cron": "^0.1.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0",
