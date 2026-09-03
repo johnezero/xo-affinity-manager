@@ -66,6 +66,7 @@ Apply these tags directly to your **XCP-ng hosts** in the Xen Orchestra UI:
 ---
 
 ## Installation
+Note: "Airgap" in the tar.gz file below, simply means the bundle includes all required dependencies for both an offline or online installation.
 
 1. Download the latest airgap release tarball from GitHub:
    https://github.com/johnezero/xo-affinity-manager/releases
